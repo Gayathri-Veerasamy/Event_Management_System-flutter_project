@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'login.dart';
 import 'dashboard.dart';
 
 class SignupPage extends StatefulWidget {
@@ -14,6 +13,7 @@ class _SignupPageState extends State<SignupPage> {
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   Future<void> _signUp() async {
     if (!_formKey.currentState!.validate()) return;
@@ -88,7 +88,6 @@ class _SignupPageState extends State<SignupPage> {
                   style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
                 SizedBox(height: 30),
-
                 Form(
                   key: _formKey,
                   child: Column(
@@ -129,17 +128,25 @@ class _SignupPageState extends State<SignupPage> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
+                          ),
                         ),
-                        obscureText: true,
+                        obscureText: !_isPasswordVisible,
                         validator: _validatePassword,
                         textInputAction: TextInputAction.done,
                       ),
                     ],
                   ),
                 ),
-
                 SizedBox(height: 30),
-
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -149,7 +156,7 @@ class _SignupPageState extends State<SignupPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      backgroundColor: Colors.purple,
+                      backgroundColor: const Color.fromARGB(255, 230, 116, 251),
                     ),
                     child: _isLoading
                         ? CircularProgressIndicator(
@@ -158,13 +165,11 @@ class _SignupPageState extends State<SignupPage> {
                           )
                         : Text(
                             'Sign Up',
-                            style: TextStyle(fontSize: 18),
+                            style: TextStyle( color: Colors.white,fontSize: 18),
                           ),
                   ),
                 ),
-
                 SizedBox(height: 16),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -181,7 +186,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),

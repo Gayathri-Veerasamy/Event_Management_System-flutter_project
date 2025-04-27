@@ -12,6 +12,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
@@ -90,7 +91,6 @@ class _LoginPageState extends State<LoginPage> {
                   style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
                 SizedBox(height: 30),
-
                 Form(
                   key: _formKey,
                   child: Column(
@@ -117,17 +117,25 @@ class _LoginPageState extends State<LoginPage> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
+                          ),
                         ),
-                        obscureText: true,
+                        obscureText: !_isPasswordVisible,
                         validator: _validatePassword,
                         textInputAction: TextInputAction.done,
                       ),
                     ],
                   ),
                 ),
-
                 SizedBox(height: 30),
-
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -137,7 +145,7 @@ class _LoginPageState extends State<LoginPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      backgroundColor: Colors.purple,
+                      backgroundColor: const Color.fromARGB(255, 230, 116, 251),
                     ),
                     child: _isLoading
                         ? CircularProgressIndicator(
@@ -146,13 +154,11 @@ class _LoginPageState extends State<LoginPage> {
                           )
                         : Text(
                             'Log In',
-                            style: TextStyle(fontSize: 18),
+                            style: TextStyle(color: Colors.white,fontSize: 18),
                           ),
                   ),
                 ),
-
                 SizedBox(height: 16),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -165,11 +171,11 @@ class _LoginPageState extends State<LoginPage> {
                             },
                       child: Text(
                         'Sign Up',
-                        style: TextStyle(color: Colors.purple),
+                        style: TextStyle(color: const Color.fromARGB(255, 39, 108, 246)),
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),

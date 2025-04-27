@@ -182,7 +182,7 @@ class _CalendarPageState extends State<CalendarPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text('Calendar'),
-          backgroundColor: Colors.purple,
+          // backgroundColor: Colors.purple,
         ),
         body: Column(
           children: [

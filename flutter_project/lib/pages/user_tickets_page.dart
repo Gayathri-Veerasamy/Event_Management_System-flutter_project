@@ -33,7 +33,7 @@ class UserTicketsPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('My Tickets'),
-          backgroundColor: Colors.purple,
+          // backgroundColor: const Color.fromARGB(255, 230, 116, 251),
         ),
         body: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance

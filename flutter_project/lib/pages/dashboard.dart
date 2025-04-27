@@ -91,6 +91,7 @@ class _DashboardPageState extends State<DashboardPage> {
       if (diff.inDays >= 1) return '${diff.inDays} day${diff.inDays > 1 ? 's' : ''} left';
       final h = diff.inHours.toString().padLeft(2, '0');
       final m = (diff.inMinutes % 60).toString().padLeft(2, '0');
+      
       return '$h:$m left';
     } catch (_) {
       return null;
@@ -303,7 +304,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       if (data['date'] != null) Text('Date: ${data['date']}'),
                       if (data['time'] != null) Text('Time: ${data['time']}'),
                       if (countdown != null)
-                        Text('Starts in: $countdown', style: const TextStyle(color: Colors.deepPurple)),
+                        Text(' $countdown', style: const TextStyle(color: Color.fromARGB(255, 255, 0, 0))),
                       Align(
                         alignment: Alignment.bottomRight,
                         child: IconButton(
