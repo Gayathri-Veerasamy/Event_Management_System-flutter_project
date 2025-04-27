@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "728240241495",
-    "project_id": "eventbookingandplanning",
-    "storage_bucket": "eventbookingandplanning.firebasestorage.app"
+    "project_number": "1056571082983",
+    "project_id": "eventdb-96b1b",
+    "storage_bucket": "eventdb-96b1b.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:728240241495:android:b7dd063ab00e5d67a35c12",
+        "mobilesdk_app_id": "1:1056571082983:android:de9d5cdaf2375b6a66ba42",
         "android_client_info": {
-          "package_name": "com.flutter_project.myapp"
+          "package_name": "com.example.eventapp"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDiiWEe0tx9jA0E6OWIAUKclrJYBNPHodI"
+          "current_key": "AIzaSyAQa-XhpcoHo56q0NqbiXMf4tCZs5speTo"
         }
       ],
       "services": {

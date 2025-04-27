@@ -1,34 +1,36 @@
-// lib/pages/event_detail_page.dart
-
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'ticket_details_page.dart'; // Make sure this path is correct
+import 'ticket_details_page.dart';
 
 class EventDetailPage extends StatelessWidget {
   final Map<String, dynamic> event;
   final String userId;
 
-  const EventDetailPage({
-    Key? key,
-    required this.event,
-    required this.userId,
-  }) : super(key: key);
+  const EventDetailPage({Key? key, required this.event, required this.userId}) : super(key: key);
 
-  /// Navigate to the TicketDetailsPage if tickets are available
   Future<void> _onBookTap(BuildContext context) async {
     final availableTickets = int.tryParse(event['availableTickets'].toString()) ?? 0;
+
     if (availableTickets == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('❌ Sorry, no tickets available.')),
+        const SnackBar(content: Text('❌ Sorry, no tickets available.')),
       );
       return;
     }
+
+    final eventId = event['id'];
+    if (eventId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Event ID missing. Please try again.')),
+      );
+      return;
+    }
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => TicketDetailsPage(
           userId: userId,
-          eventId: event['id'],
+          eventId: eventId,
           eventData: event,
         ),
       ),
@@ -43,8 +45,8 @@ class EventDetailPage extends StatelessWidget {
           Expanded(
             flex: 3,
             child: Text(
-              "$label",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              label,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           Expanded(
@@ -64,7 +66,7 @@ class EventDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final availableTickets = int.tryParse(event['availableTickets'].toString()) ?? 0;
-    final isFree = event['ticketPrice'] == '0';
+    final isFree = event['ticketPrice'] != null && event['ticketPrice'].toString() == '0';
 
     return Scaffold(
       appBar: AppBar(
@@ -74,92 +76,55 @@ class EventDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image
             if ((event['mediaUrl'] ?? '').toString().startsWith('http'))
               ClipRRect(
-                borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
+                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
                 child: Image.network(
                   event['mediaUrl'],
                   width: double.infinity,
                   height: 200,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    height: 200,
-                    color: Colors.grey[300],
-                    child: Icon(Icons.broken_image, size: 50),
-                  ),
                 ),
               ),
 
-            // Padding around content
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title
                   Text(
                     event['name'] ?? '',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-
-                  SizedBox(height: 12),
-                  Divider(),
-
-                  // Date & Time
+                  const SizedBox(height: 12),
+                  const Divider(),
                   _buildDetailRow('Date', event['date'] ?? ''),
                   _buildDetailRow('Time', event['time'] ?? ''),
-
-                  // Location with icon
-                  _buildDetailRow(
-                    'Location',
-                    event['location'] ?? '',
-                    trailingIcon: Icon(Icons.location_on, color: Colors.blue),
-                  ),
-
-                  // Tickets left
-                  _buildDetailRow(
-                    'Tickets',
-                    availableTickets < 0 ? 'Unlimited' : '$availableTickets left',
-                  ),
-
-                  // Price
+                  _buildDetailRow('Location', event['location'] ?? '', trailingIcon: const Icon(Icons.location_on)),
+                  _buildDetailRow('Tickets', availableTickets < 0 ? 'Unlimited' : '$availableTickets left'),
                   _buildDetailRow('Price', isFree ? 'Free' : '₹${event['ticketPrice']}'),
 
-                  SizedBox(height: 16),
-
-                  // Description
                   if ((event['description'] ?? '').toString().isNotEmpty) ...[
-                    Text(
+                    const SizedBox(height: 16),
+                    const Text(
                       'Description',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 8),
-                    Text(
-                      event['description'],
-                      style: TextStyle(fontSize: 14, color: Colors.grey[800]),
-                    ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 8),
+                    Text(event['description']),
                   ],
 
-                  // Book Ticket button
+                  const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: availableTickets == 0 ? null : () => _onBookTap(context),
-                      icon: Icon(Icons.event_available),
-                      label: Text(
-                        availableTickets == 0 ? 'Sold Out' : 'Book Ticket',
-                        style: TextStyle(fontSize: 16),
-                      ),
+                      icon: const Icon(Icons.event_available),
+                      label: Text(availableTickets == 0 ? 'Sold Out' : 'Book Ticket'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: availableTickets == 0
-                            ? Colors.grey
-                            : Colors.green,
-                        padding: EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                        backgroundColor: availableTickets == 0 ? Colors.grey : Colors.green,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                     ),
                   ),

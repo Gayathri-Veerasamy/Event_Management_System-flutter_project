@@ -1,6 +1,6 @@
-// add_event.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dashboard.dart';  // Import your DashboardPage
 
 class AddEventPage extends StatefulWidget {
   final String userId;
@@ -80,8 +80,8 @@ class _AddEventPageState extends State<AddEventPage> {
     final time =
         '${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}:00';
 
-    final price = _isFree ? '0' : _ticketPriceController.text.trim();
-    final slots = _isUnlimited ? '-1' : _availableTicketsController.text.trim();
+    final price = _isFree ? '0' : (_ticketPriceController.text.isNotEmpty ? _ticketPriceController.text.trim() : '0');
+    final slots = _isUnlimited ? '-1' : (_availableTicketsController.text.isNotEmpty ? _availableTicketsController.text.trim() : '0');
 
     try {
       await FirebaseFirestore.instance.collection('events').add({
@@ -101,7 +101,19 @@ class _AddEventPageState extends State<AddEventPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Event created successfully')),
       );
-      Navigator.pop(context);
+
+      // After the event is saved, navigate back to DashboardPage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => DashboardPage(
+            username: widget.userId,
+            email: 'user@example.com',  // Replace with actual user data
+            password: 'userpassword',   // Replace with actual user data
+            userId: widget.userId,
+          ),
+        ),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error creating event: $e')),
@@ -129,106 +141,123 @@ class _AddEventPageState extends State<AddEventPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Add Event')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              Text("Add Event Details",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              SizedBox(height: 16),
+    return WillPopScope(
+      onWillPop: () async {
+        // Navigate to the DashboardPage when back button is pressed
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DashboardPage(
+              username: widget.userId,
+              email: 'user@example.com',  // Replace with actual user data
+              password: 'userpassword',   // Replace with actual user data
+              userId: widget.userId,
+            ),
+          ),
+        );
+        return false; // Prevent the default back button behavior
+      },
+      child: Scaffold(
+        appBar: AppBar(title: Text('Add Event')),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Text("Add Event Details",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                SizedBox(height: 16),
 
-              _buildTextField('Event Name', _nameController),
-              _buildTextField('Media URL (image/video)', _mediaUrlController),
+                _buildTextField('Event Name', _nameController),
+                _buildTextField('Media URL (image/video)', _mediaUrlController),
 
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: 'Event Type',
-                    border: OutlineInputBorder(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: 'Event Type',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: _eventTypes
+                        .map((type) => DropdownMenuItem(
+                              value: type,
+                              child: Text(type),
+                            ))
+                        .toList(),
+                    value: _selectedType,
+                    onChanged: (val) => setState(() => _selectedType = val),
+                    validator: (val) =>
+                        val == null ? 'Please select an event type' : null,
                   ),
-                  items: _eventTypes
-                      .map((type) => DropdownMenuItem(
-                            value: type,
-                            child: Text(type),
-                          ))
-                      .toList(),
-                  value: _selectedType,
-                  onChanged: (val) => setState(() => _selectedType = val),
-                  validator: (val) =>
-                      val == null ? 'Please select an event type' : null,
                 ),
-              ),
 
-              ListTile(
-                title: Text(
-                  'Date: ${_selectedDate != null ? _selectedDate!.toLocal().toIso8601String().split("T")[0] : 'Pick a date'}',
+                ListTile(
+                  title: Text(
+                    'Date: ${_selectedDate != null ? _selectedDate!.toLocal().toIso8601String().split("T")[0] : 'Pick a date'}',
+                  ),
+                  trailing: Icon(Icons.calendar_today),
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: _selectedDate ?? DateTime.now(),
+                      firstDate: DateTime(2020),
+                      lastDate: DateTime(2100),
+                    );
+                    if (picked != null) {
+                      setState(() => _selectedDate = picked);
+                    }
+                  },
                 ),
-                trailing: Icon(Icons.calendar_today),
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: _selectedDate ?? DateTime.now(),
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime(2100),
-                  );
-                  if (picked != null) {
-                    setState(() => _selectedDate = picked);
-                  }
-                },
-              ),
 
-              ListTile(
-                title: Text(
-                  'Time: ${_selectedTime != null ? _selectedTime!.format(context) : 'Pick a time'}',
+                ListTile(
+                  title: Text(
+                    'Time: ${_selectedTime != null ? _selectedTime!.format(context) : 'Pick a time'}',
+                  ),
+                  trailing: Icon(Icons.access_time),
+                  onTap: () async {
+                    final picked = await showTimePicker(
+                      context: context,
+                      initialTime: _selectedTime ?? TimeOfDay.now(),
+                    );
+                    if (picked != null) {
+                      setState(() => _selectedTime = picked);
+                    }
+                  },
                 ),
-                trailing: Icon(Icons.access_time),
-                onTap: () async {
-                  final picked = await showTimePicker(
-                    context: context,
-                    initialTime: _selectedTime ?? TimeOfDay.now(),
-                  );
-                  if (picked != null) {
-                    setState(() => _selectedTime = picked);
-                  }
-                },
-              ),
 
-              _buildTextField('Location', _locationController),
+                _buildTextField('Location', _locationController),
 
-              SwitchListTile(
-                title: Text('Free Event'),
-                value: _isFree,
-                onChanged: (v) => setState(() => _isFree = v),
-              ),
-              if (!_isFree)
-                _buildTextField('Ticket Price (₹)', _ticketPriceController,
-                    inputType: TextInputType.number),
+                SwitchListTile(
+                  title: Text('Free Event'),
+                  value: _isFree,
+                  onChanged: (v) => setState(() => _isFree = v),
+                ),
+                if (!_isFree)
+                  _buildTextField('Ticket Price (₹)', _ticketPriceController,
+                      inputType: TextInputType.number),
 
-              SwitchListTile(
-                title: Text('Unlimited Slots'),
-                value: _isUnlimited,
-                onChanged: (v) => setState(() => _isUnlimited = v),
-              ),
-              if (!_isUnlimited)
-                _buildTextField(
-                    'Available Tickets', _availableTicketsController,
-                    inputType: TextInputType.number),
+                SwitchListTile(
+                  title: Text('Unlimited Slots'),
+                  value: _isUnlimited,
+                  onChanged: (v) => setState(() => _isUnlimited = v),
+                ),
+                if (!_isUnlimited)
+                  _buildTextField(
+                      'Available Tickets', _availableTicketsController,
+                      inputType: TextInputType.number),
 
-              _buildTextField('Description', _descriptionController,
-                  maxLines: 3),
+                _buildTextField('Description', _descriptionController,
+                    maxLines: 3),
 
-              SizedBox(height: 20),
-              ElevatedButton.icon(
-                icon: Icon(Icons.save),
-                label: Text('Save Event'),
-                onPressed: _saveEvent,
-              ),
-            ],
+                SizedBox(height: 20),
+                ElevatedButton.icon(
+                  icon: Icon(Icons.save),
+                  label: Text('Save Event'),
+                  onPressed: _saveEvent,
+                ),
+              ],
+            ),
           ),
         ),
       ),
