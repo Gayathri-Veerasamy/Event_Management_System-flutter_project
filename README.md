@@ -24,32 +24,31 @@ For help getting started with Flutter development, view the [online documentatio
 - **Calendar Integration**: Animated calendar for selecting event dates.
 - **REST API Integration**: Fetch dynamic data from event APIs.
 
+---
 
-## Installation
+### 📦 Installation & Run Instructions
 
-1. Clone the repository:
-
+1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/event-planning-app.git
+   git clone https://github.com/Gayathri-Veerasamy/Event_Management_System-flutter_project.git
    ```
 
-2. Navigate to the project directory:
-
+2. **Navigate to the Flutter project directory**:
    ```bash
-   cd event-planning-app
+   cd Event_Management_System-flutter_project/flutter_project
    ```
 
-3. Install dependencies:
-
+3. **Install project dependencies**:
    ```bash
    flutter pub get
    ```
 
-4. Run the app:
-
+4. **Run the Flutter application**:
    ```bash
    flutter run
    ```
+
+---
 
 ## Dependencies
 
